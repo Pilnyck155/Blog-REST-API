@@ -1,0 +1,1 @@
+docker run --name postgres-3 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=password -e POSTGRES_DB=blog -d -p 3000:5432 postgres:alpine
