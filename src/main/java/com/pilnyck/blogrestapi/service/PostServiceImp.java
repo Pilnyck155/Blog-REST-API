@@ -36,6 +36,7 @@ public class PostServiceImp implements PostService{
 
     @Override
     public Post editPostById(Post post, long id) {
+        //TODO: Rewrite method and take one query to DB
         Post postFromDB = postRepository.findById(id).get();
         if (Objects.nonNull(post.getTitle()) && !"".equalsIgnoreCase(post.getTitle())){
             postFromDB.setTitle(post.getTitle());

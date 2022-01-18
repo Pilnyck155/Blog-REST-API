@@ -17,23 +17,27 @@ public class PostController {
     @PostMapping
     public Post savePost(@RequestBody Post post){
         return postService.savePost(post);
+        //TODO: ADD RESPONSE ANSWER
     }
 
     @GetMapping
     public List<Post> getAllPosts(){
         return postService.getAllPosts();
+        //TODO: ADD RESPONSE ANSWER
     }
 
     //TODO: GET_BY_ID method
     @GetMapping("/{id}")
     public Post getById(@PathVariable("id") long id){
         return postService.getById(id);
+        //TODO: ADD RESPONSE ANSWER
     }
 
     //TODO: PUT method
     @PutMapping("/{id}")
     public Post editPostById(@RequestBody Post post, @PathVariable long id){
         return postService.editPostById(post, id);
+        //TODO: ADD RESPONSE ANSWER
     }
 
     //TODO: DELETE method
@@ -41,6 +45,6 @@ public class PostController {
     public String deletePostById(@PathVariable("id") long id){
         postService.deletePostById(id);
         return "Post delete sucсessful";
+        //TODO: ADD RESPONSE ANSWER
     }
-
 }

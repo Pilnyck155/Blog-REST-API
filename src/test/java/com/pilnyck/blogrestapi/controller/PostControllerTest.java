@@ -1,5 +1,7 @@
 package com.pilnyck.blogrestapi.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pilnyck.blogrestapi.entity.Post;
 import com.pilnyck.blogrestapi.service.PostService;
 import org.hamcrest.Matchers;
@@ -32,12 +34,21 @@ class PostControllerTest {
 
     @Test
     void shouldSavePost() throws Exception {
+//        Post post = Post.builder()
+//                .title("Sport")
+//                .content("Dynamo wins")
+//                .build();
+
         this.mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/posts")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                       // .content(objectToJson(post)))
                         .content("{\"title\": \"Sport\", \"content\": \"Dynamo wins again\"}"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Sport"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Sport"))
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+                .andDo(MockMvcResultHandlers.print());
         verify(postService).savePost(any(Post.class));
     }
 
@@ -61,7 +72,8 @@ class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.size()", Matchers.is(2)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("Animals"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("Fresh news"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("Fresh news"))
+                .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
@@ -73,10 +85,11 @@ class PostControllerTest {
                 .build();
         when(postService.getById(1L)).thenReturn(post);
         this.mockMvc.perform(MockMvcRequestBuilders
-                        .get("/api/v1/posts/1"))
+                        .get("/api/v1/posts/{id}", 1))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Animals"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("The elephant escaped from zoo"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("The elephant escaped from zoo"))
+                .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
@@ -85,11 +98,13 @@ class PostControllerTest {
                         .put("/api/v1/posts/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .characterEncoding("UTF-8")
+                        //.contentType("application/json;charset=UTF-8")
+                        //.characterEncoding("UTF-8")
                         .content("{\"id\": \"1\", \"title\": \"Sport\", \"content\": \"Dynamo wins again\"}"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Sport"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Dynamo wins again"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Dynamo wins again"))
+                .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
@@ -97,6 +112,11 @@ class PostControllerTest {
         this.mockMvc.perform(MockMvcRequestBuilders
                         .delete("/api/v1/posts/{id}", 1))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("Post delete sucсessful"));
+                .andExpect(MockMvcResultMatchers.content().string("Post delete sucсessful"))
+                .andDo(MockMvcResultHandlers.print());
     }
+
+//    public static String objectToJson(Object object) throws JsonProcessingException {
+//        return new ObjectMapper().writeValueAsString(object);
+//    }
 }
