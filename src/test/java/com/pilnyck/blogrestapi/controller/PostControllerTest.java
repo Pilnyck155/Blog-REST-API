@@ -190,4 +190,6 @@ class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.content().string("Post delete sucсessful"))
                 .andDo(MockMvcResultHandlers.print());
     }
+
+    //TODO: Write test to add and delete star method
 }

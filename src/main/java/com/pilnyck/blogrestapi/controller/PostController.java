@@ -56,13 +56,18 @@ public class PostController {
         return "Post delete sucсessful";
     }
 
-//    //TODO: findByTitle
-//    @GetMapping("?title={title}")
-//    public List<Post> findPostByTitle(@PathVariable("title") String title){
-//        List<Post> postByTitle = postService.findPostByTitle(title);
-//        logger.info("findPostByTitle {}", postByTitle);
-//        return postByTitle;
-//    }
-//    //TODO: sortByTitle
+    @GetMapping("/star")
+    public List<Post> getAllPostsWithStar(){
+        return postService.getAllPostsWithStar();
+    }
 
+    @PutMapping("/{id}/star")
+    public Post addStarToPost(@PathVariable("id") long id){
+        return postService.addStarToPost(id);
+    }
+
+    @DeleteMapping("/{id}/star")
+    public Post deleteStarFromPost(@PathVariable("id") long id){
+        return postService.deleteStarFromPost(id);
+    }
 }

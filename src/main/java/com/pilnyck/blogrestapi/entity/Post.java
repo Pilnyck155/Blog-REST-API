@@ -26,6 +26,11 @@ public class Post {
             generator = "post_sequence"
     )
     private long id;
+
+    @Column(nullable = false)
     private String title;
+
+    @Column(nullable = false)
     private String content;
+    private boolean star;
 }

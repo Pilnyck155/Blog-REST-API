@@ -18,4 +18,10 @@ public interface PostService {
     List<Post> findAllPostsByTitle(String title);
 
     List<Post> findAllPostsSortedByTitle();
+
+    List<Post> getAllPostsWithStar();
+
+    Post addStarToPost(long id);
+
+    Post deleteStarFromPost(long id);
 }

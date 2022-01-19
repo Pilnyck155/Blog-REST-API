@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class PostServiceImp implements PostService{
+public class PostServiceImp implements PostService {
     Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
@@ -42,10 +42,10 @@ public class PostServiceImp implements PostService{
     public Post editPostById(Post post, long id) {
         //TODO: Rewrite method and take one query to DB
         Post postFromDB = postRepository.findById(id).get();
-        if (Objects.nonNull(post.getTitle()) && !"".equalsIgnoreCase(post.getTitle())){
+        if (Objects.nonNull(post.getTitle()) && !"".equalsIgnoreCase(post.getTitle())) {
             postFromDB.setTitle(post.getTitle());
         }
-        if (Objects.nonNull(post.getContent()) && !"".equalsIgnoreCase(post.getContent())){
+        if (Objects.nonNull(post.getContent()) && !"".equalsIgnoreCase(post.getContent())) {
             postFromDB.setContent(post.getContent());
         }
         return postRepository.save(postFromDB);
@@ -60,6 +60,20 @@ public class PostServiceImp implements PostService{
     public List<Post> findAllPostsSortedByTitle() {
         logger.info("int findAllPostsSortedByTitle title");
         return postRepository.findAll(Sort.by(Sort.Direction.ASC, "title"));
-        //return postRepository.findAllPostsOrderByTitleAsc(sort);
+    }
+
+    @Override
+    public List<Post> getAllPostsWithStar() {
+        return postRepository.findAllByStarTrue();
+    }
+
+    @Override
+    public Post addStarToPost(long id) {
+        return postRepository.updatePostByIdAndSetTrue(id);
+    }
+
+    @Override
+    public Post deleteStarFromPost(long id) {
+        return postRepository.updatePostByIdAndSetFalse(id);
     }
 }
