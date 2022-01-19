@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -79,6 +80,69 @@ class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("Fresh news"))
                 .andDo(MockMvcResultHandlers.print());
     }
+
+    @Test
+    @DisplayName("test get all posts with title passed successfully")
+    void whenMethodCallWithTitleParam_thenReturnAllPostsWithCurrentTitle() throws Exception {
+        Post post = Post.builder()
+                .id(1L)
+                .title("Animals")
+                .content("The elephant escaped from zoo")
+                .build();
+        Post secondPost = Post.builder()
+                .id(2L)
+                .title("Fresh news")
+                .content("Fresh stupid news")
+                .build();
+        Post thirdPost = Post.builder()
+                .id(3L)
+                .title("Animals")
+                .content("The rhino escaped from zoo")
+                .build();
+
+        when(postService.findAllPostsByTitle("Animals")).thenReturn(List.of(post, thirdPost));
+        this.mockMvc
+                .perform(MockMvcRequestBuilders
+                        .get("/api/v1/posts?title={title}", "Animals"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.size()", Matchers.is(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("Animals"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("Animals"))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+
+    @Test
+    @DisplayName("test get all posts sorted by title passed successfully")
+    void whenMethodCallWithSortParam_thenReturnAllPostsSortedByCurrentTitle() throws Exception {
+        Post post = Post.builder()
+                .id(1L)
+                .title("Politics")
+                .content("The member of congress escaped from zoo")
+                .build();
+        Post secondPost = Post.builder()
+                .id(2L)
+                .title("Documents")
+                .content("Secret documents disappeared")
+                .build();
+        Post thirdPost = Post.builder()
+                .id(3L)
+                .title("Animals")
+                .content("The rhino escaped from zoo")
+                .build();
+
+        when(postService.findAllPostsSortedByTitle()).thenReturn(List.of(thirdPost, secondPost, post));
+        this.mockMvc
+                .perform(MockMvcRequestBuilders
+                        .get("/api/v1/posts?sort={title}", "Animals"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.size()", Matchers.is(3)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("Animals"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("Documents"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[2].title").value("Politics"))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
 
     @Test
     @DisplayName("test get post by id passed successfully")
