@@ -192,4 +192,63 @@ class PostControllerTest {
     }
 
     //TODO: Write test to add and delete star method
+
+    @Test
+    @DisplayName("test get all posts with star passed successfully")
+    public void whenCallMethod_thenReturnAllPostsWithStar() throws Exception {
+        Post post = Post.builder()
+                .id(1L)
+                .title("Animals")
+                .content("The elephant escaped from zoo")
+                .star(true)
+                .build();
+        Post secondPost = Post.builder()
+                .id(2L)
+                .title("Fresh news")
+                .content("Fresh stupid news")
+                .star(true)
+                .build();
+
+        when(postService.getAllPostsWithStar()).thenReturn(List.of(post, secondPost));
+        this.mockMvc
+                .perform(MockMvcRequestBuilders
+                        .get("/api/v1/posts/star"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.size()", Matchers.is(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].star").value(true))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].star").isBoolean())
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+
+    @Test
+    @DisplayName("test add star to post passed successfully")
+    public void whenIdIsValid_thenAddStarToPostById() throws Exception {
+        Post post = Post.builder()
+                .id(1L)
+                .title("Animals")
+                .content("The elephant escaped from zoo")
+                .star(true)
+                .build();
+        when(postService.addStarToPost(1L)).thenReturn(post);
+        this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/posts/{id}/star", 1))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.star").value(true));
+    }
+
+    //deleteStarFromPost
+    @Test
+    @DisplayName("test delete star from post passed successfully")
+    public void whenIdIsValid_thenDeleteStarFromPostById() throws Exception {
+        Post post = Post.builder()
+                .id(1L)
+                .title("Animals")
+                .content("The elephant escaped from zoo")
+                .star(false)
+                .build();
+        when(postService.deleteStarFromPost(1L)).thenReturn(post);
+        this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/posts/{id}/star", 1))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.star").value(false));
+    }
 }
