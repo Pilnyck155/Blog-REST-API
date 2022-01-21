@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Data
@@ -25,7 +26,7 @@ public class Post {
             strategy = GenerationType.SEQUENCE,
             generator = "post_sequence"
     )
-    private long id;
+    private long postId;
 
     @Column(nullable = false)
     private String title;
@@ -33,4 +34,8 @@ public class Post {
     @Column(nullable = false)
     private String content;
     private boolean star;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "post_id", referencedColumnName = "postId")
+    private List<Comment> comments;
 }

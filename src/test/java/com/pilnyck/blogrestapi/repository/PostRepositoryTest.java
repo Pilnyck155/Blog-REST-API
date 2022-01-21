@@ -6,9 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.web.servlet.MockMvc;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 class PostRepositoryTest {
@@ -26,7 +23,7 @@ class PostRepositoryTest {
                 .content("Fresh stupid news")
                 .build();
         Post secondPost = Post.builder()
-                .id(2L)
+                .postId(2L)
                 .title("Very fresh news")
                 .content("Very fresh stupid news")
                 .build();

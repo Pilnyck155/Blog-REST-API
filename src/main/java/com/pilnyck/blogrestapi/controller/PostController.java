@@ -1,6 +1,8 @@
 package com.pilnyck.blogrestapi.controller;
 
+import com.pilnyck.blogrestapi.entity.Comment;
 import com.pilnyck.blogrestapi.entity.Post;
+import com.pilnyck.blogrestapi.service.CommentService;
 import com.pilnyck.blogrestapi.service.PostService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,9 @@ public class PostController {
 
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private CommentService commentService;
 
     @PostMapping
     public Post savePost(@RequestBody Post post) {
@@ -40,34 +45,49 @@ public class PostController {
 
     @GetMapping("/{id}")
     public Post getById(@PathVariable("id") long id) {
+        logger.info("getById");
         return postService.getById(id);
     }
 
 
     @PutMapping("/{id}")
     public Post editPostById(@RequestBody Post post, @PathVariable long id) {
+        logger.info("editPostById");
         return postService.editPostById(post, id);
     }
 
 
     @DeleteMapping("/{id}")
     public String deletePostById(@PathVariable("id") long id) {
+        logger.info("deletePostById");
+        // TODO: Change method to void
         postService.deletePostById(id);
         return "Post delete sucсessful";
     }
 
     @GetMapping("/star")
     public List<Post> getAllPostsWithStar(){
+        logger.info("getAllPostsWithStar");
         return postService.getAllPostsWithStar();
     }
 
     @PutMapping("/{id}/star")
     public Post addStarToPost(@PathVariable("id") long id){
+        logger.info("addStarToPost");
         return postService.addStarToPost(id);
     }
 
     @DeleteMapping("/{id}/star")
     public Post deleteStarFromPost(@PathVariable("id") long id){
+        logger.info("deleteStarFromPost");
         return postService.deleteStarFromPost(id);
     }
+
+//    @PostMapping("{id}/comments")
+//    public Comment addCommentToPostById(@RequestParam(value = "id", required = false) long id,
+//                                        @RequestBody Comment comment) {
+//        logger.info("in addCommentToPostById method");
+//        //comment.setPostId(id);
+//        return commentService.saveComment(id, comment);
+//    }
 }

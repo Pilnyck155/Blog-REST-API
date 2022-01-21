@@ -2,7 +2,6 @@ package com.pilnyck.blogrestapi.service;
 
 import com.pilnyck.blogrestapi.entity.Post;
 import com.pilnyck.blogrestapi.repository.PostRepository;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,12 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class PostServiceTest {
@@ -30,17 +27,17 @@ class PostServiceTest {
     @BeforeEach
     void setUp(){
         Post post = Post.builder()
-                .id(1L)
+                .postId(1L)
                 .title("News")
                 .content("Very happy news")
                 .build();
         Post secondPost = Post.builder()
-                .id(2L)
+                .postId(2L)
                 .title("Events")
                 .content("West Side story won a Golden Globe")
                 .build();
         Post thirdPost = Post.builder()
-                .id(3L)
+                .postId(3L)
                 .title("Sport")
                 .content("Italian club Genoa fired Andriy Shevchenko from the post of head coach.")
                 .build();
@@ -56,14 +53,14 @@ class PostServiceTest {
     @DisplayName("test save one post passed successfully")
     void whenDataIsValid_thenSaveAndReturnPost() {
         Post actualPost = Post.builder()
-                .id(1L)
+                .postId(1L)
                 .title("News")
                 .content("Very happy news")
                 .build();
         Post expectedPost = postService.savePost(actualPost);
         assertEquals(expectedPost.getContent(), actualPost.getContent());
         assertEquals(expectedPost.getTitle(), actualPost.getTitle());
-        assertEquals(expectedPost.getId(), actualPost.getId());
+        assertEquals(expectedPost.getPostId(), actualPost.getPostId());
     }
 
     @Test
@@ -79,7 +76,7 @@ class PostServiceTest {
     void whenCallMethod_thenReturnAllPostsAndCheckPost() {
         List<Post> actualPostList = postService.getAllPosts();
         Post expected = Post.builder()
-                .id(2L)
+                .postId(2L)
                 .title("Events")
                 .content("West Side story won a Golden Globe")
                 .build();
@@ -91,7 +88,7 @@ class PostServiceTest {
     void whenCallMethod_thenReturnAllPostsAndCheckTitles() {
         List<Post> actualPostList = postService.getAllPosts();
         Post expected = Post.builder()
-                .id(2L)
+                .postId(2L)
                 .title("Events")
                 .content("West Side story won a Golden Globe")
                 .build();
@@ -103,7 +100,7 @@ class PostServiceTest {
     void whenIdIsValid_thenPostShouldFound() {
         long id = 1L;
         Post findPost = postService.getById(id);
-        assertEquals(id, findPost.getId());
+        assertEquals(id, findPost.getPostId());
     }
 
     @Test
@@ -136,7 +133,7 @@ class PostServiceTest {
     @DisplayName("test edit post by id passed successfully")
     void editPostById() {
         Post expectedPost = Post.builder()
-                .id(1L)
+                .postId(1L)
                 .title("Animals")
                 .content("In the Vinnytsia zoo born a panda")
                 .build();
