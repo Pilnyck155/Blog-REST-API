@@ -19,8 +19,8 @@ public class PostController {
     @Autowired
     private PostService postService;
 
-    @Autowired
-    private CommentService commentService;
+//    @Autowired
+//    private CommentService commentService;
 
     @PostMapping
     public Post savePost(@RequestBody Post post) {
