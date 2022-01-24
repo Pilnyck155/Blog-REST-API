@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/posts")
 public class CommentController {
@@ -23,7 +25,6 @@ public class CommentController {
     public CommentWithPostDto addCommentToPostById(@PathVariable long id,
                                                    @RequestBody Comment comment) {
         logger.info("in addCommentToPostById method");
-        //comment.setPostId(id);
         Comment commentFromDB = commentService.saveComment(id, comment);
         CommentWithPostDto commentWithPostDto = toCommentWithPostDto(commentFromDB);
         return commentWithPostDto;
@@ -32,17 +33,18 @@ public class CommentController {
 
     //    GET /api/v1/posts/{id}/comments
     @GetMapping("/{id}/comments")
-    public void getCommentsById(@RequestParam(value = "id", required = false) long id) {
+    public List<Comment> getCommentsById(@RequestParam(value = "id", required = false) long postId) {
         logger.info("in getCommentsById method");
+        return commentService.getCommentsByPostId(postId);
 
     }
 
     //    GET /api/v1/posts/{postId}/comment/{commentId}
     @GetMapping("/{postId}/comment/{commentId}")
-    public Post getCommentsByPostIdAndCommentId(@RequestParam(value = "postId", required = false) long postId,
+    public List<Comment> getCommentsByPostIdAndCommentId(@RequestParam(value = "postId", required = false) long postId,
                                                 @RequestParam(value = "commentId", required = false) long commentId) {
         logger.info("in getCommentsByPostIdAndCommentId method");
-        return null;
+        return commentService.getCommentsByPostIdAndCommentId(postId, commentId);
     }
 
     private CommentWithPostDto toCommentWithPostDto(Comment comment) {

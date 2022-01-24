@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class DefaultCommentService implements CommentService {
     Logger logger = LoggerFactory.getLogger(getClass());
@@ -27,6 +29,18 @@ public class DefaultCommentService implements CommentService {
         Comment savedComment = commentRepository.save(comment);
         //logger.info("comment from DB {}", savedComment);
         return savedComment;
-        //return commentRepository.saveComment(comment);
+    }
+
+    @Override
+    public List<Comment> getCommentsByPostId(long postId) {
+        Post postFromDB = postRepository.getById(postId);
+        List<Comment> commentsFromPost = postFromDB.getComments();
+        logger.info("comments by post id {}", commentsFromPost);
+        return commentsFromPost;
+    }
+
+    @Override
+    public List<Comment> getCommentsByPostIdAndCommentId(long postId, long commentId) {
+        return commentRepository.findByPostIdAndCommentId(postId, commentId);
     }
 }
