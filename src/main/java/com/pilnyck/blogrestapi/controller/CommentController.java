@@ -1,6 +1,7 @@
 package com.pilnyck.blogrestapi.controller;
 
 import com.pilnyck.blogrestapi.dto.CommentWithPostDto;
+import com.pilnyck.blogrestapi.dto.CommentWithoutPostDto;
 import com.pilnyck.blogrestapi.dto.PostWithoutCommentDto;
 import com.pilnyck.blogrestapi.entity.Comment;
 import com.pilnyck.blogrestapi.entity.Post;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -33,18 +35,29 @@ public class CommentController {
 
     //    GET /api/v1/posts/{id}/comments
     @GetMapping("/{id}/comments")
-    public List<Comment> getCommentsById(@RequestParam(value = "id", required = false) long postId) {
+    public List<CommentWithoutPostDto> getCommentsByPostId(@PathVariable("id") long postId) {
         logger.info("in getCommentsById method");
-        return commentService.getCommentsByPostId(postId);
+        List<Comment> commentsByPostId = commentService.getCommentsByPostId(postId);
+        List<CommentWithoutPostDto> listComments = new ArrayList<>();
+        for(Comment comment : commentsByPostId){
+            listComments.add(toCommentWithoutPostDto(comment));
+        }
+        //List<CommentWithoutPostDto> listOfComments = toCommentWithoutPostDto(commentsByPostId);
+        logger.info("in getCommentsById method {}", commentsByPostId);
+        return listComments;
 
     }
 
     //    GET /api/v1/posts/{postId}/comment/{commentId}
     @GetMapping("/{postId}/comment/{commentId}")
-    public List<Comment> getCommentsByPostIdAndCommentId(@RequestParam(value = "postId", required = false) long postId,
-                                                @RequestParam(value = "commentId", required = false) long commentId) {
+    public CommentWithoutPostDto getCommentsByPostIdAndCommentId(@PathVariable("postId") long postId,
+                                                              @PathVariable("commentId") long commentId) {
         logger.info("in getCommentsByPostIdAndCommentId method");
-        return commentService.getCommentsByPostIdAndCommentId(postId, commentId);
+        Comment commentFromDB = commentService.getCommentsByPostIdAndCommentId(postId, commentId);
+
+        CommentWithoutPostDto commentWithoutPostDto = toCommentWithoutPostDto(commentFromDB);
+        logger.info("in getCommentsByPostIdAndCommentId method {}", commentWithoutPostDto);
+        return commentWithoutPostDto;
     }
 
     private CommentWithPostDto toCommentWithPostDto(Comment comment) {
@@ -62,5 +75,13 @@ public class CommentController {
 
         commentWithPostDto.setPostWithoutCommentDto(postWithoutCommentDto);
         return commentWithPostDto;
+    }
+
+    private CommentWithoutPostDto toCommentWithoutPostDto(Comment comment) {
+        CommentWithoutPostDto commentWithoutPostDto = new CommentWithoutPostDto();
+        commentWithoutPostDto.setCommentId(comment.getCommentId());
+        commentWithoutPostDto.setText(comment.getText());
+        commentWithoutPostDto.setCreationDate(comment.getCreationDate());
+        return commentWithoutPostDto;
     }
 }

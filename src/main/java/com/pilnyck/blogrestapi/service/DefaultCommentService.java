@@ -35,12 +35,13 @@ public class DefaultCommentService implements CommentService {
     public List<Comment> getCommentsByPostId(long postId) {
         Post postFromDB = postRepository.getById(postId);
         List<Comment> commentsFromPost = postFromDB.getComments();
-        logger.info("comments by post id {}", commentsFromPost);
+        //logger.info("comments by post id {}", commentsFromPost);
         return commentsFromPost;
     }
 
     @Override
-    public List<Comment> getCommentsByPostIdAndCommentId(long postId, long commentId) {
-        return commentRepository.findByPostIdAndCommentId(postId, commentId);
+    public Comment getCommentsByPostIdAndCommentId(long postId, long commentId) {
+        Comment byPostIdAndCommentId = commentRepository.findCommentByPostIdAndCommentId(postId, commentId);
+        return byPostIdAndCommentId;
     }
 }
