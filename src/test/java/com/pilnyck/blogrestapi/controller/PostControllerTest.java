@@ -234,7 +234,6 @@ class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.star").value(true));
     }
 
-    //deleteStarFromPost
     @Test
     @DisplayName("test delete star from post passed successfully")
     public void whenIdIsValid_thenDeleteStarFromPostById() throws Exception {
@@ -250,7 +249,6 @@ class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.star").value(false));
     }
 
-    //get post with all comments
     @Test
     @DisplayName("test get post with all comments passed successfully")
     public void whenIdIsValid_thenReturnPostWithAllComments() throws Exception {
@@ -277,7 +275,6 @@ class PostControllerTest {
         Optional<Post> optionalPost = Optional.of(post);
 
         when(postService.getPostWithAllComments(1L)).thenReturn(optionalPost);
-        //when(postService.getPostWithAllComments(1L)).thenReturn(optionalPost);
         this.mockMvc.perform(MockMvcRequestBuilders
                 .get("/api/v1/posts/{id}/full", 1))
                 .andExpect(MockMvcResultMatchers.status().isOk())

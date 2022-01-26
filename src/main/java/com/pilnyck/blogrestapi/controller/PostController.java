@@ -24,9 +24,6 @@ public class PostController {
     @Autowired
     private PostService postService;
 
-//    @Autowired
-//    private CommentService commentService;
-
     @PostMapping
     public Post savePost(@RequestBody Post post) {
         return postService.savePost(post);
@@ -47,20 +44,17 @@ public class PostController {
         }
     }
 
-
     @GetMapping("/{id}")
     public Post getById(@PathVariable("id") long id) {
         logger.info("getById");
         return postService.getById(id);
     }
 
-
     @PutMapping("/{postId}")
     public Post editPostById(@RequestBody Post post, @PathVariable long postId) {
         logger.info("editPostById");
         return postService.editPostById(post, postId);
     }
-
 
     @DeleteMapping("/{id}")
     public String deletePostById(@PathVariable("id") long id) {
@@ -90,12 +84,11 @@ public class PostController {
 
     @GetMapping("/{id}/full")
     public PostWithCommentsDto getPostWithAllComments(@PathVariable("id") long postId) {
-        Optional <Post> postFromDb = postService.getPostWithAllComments(postId);
-        if (!postFromDb.isPresent()){
+        Optional<Post> postFromDb = postService.getPostWithAllComments(postId);
+        if (!postFromDb.isPresent()) {
             throw new IllegalArgumentException("Post with current id doesn't exist");
         }
         Post post = postFromDb.get();
-        //Post postFromDb = postService.getPostWithAllComments(postId);
         PostWithCommentsDto postWithCommentsDto = toPostWithCommentsDto(post);
         return postWithCommentsDto;
     }
@@ -109,9 +102,6 @@ public class PostController {
         postWithCommentsDto.setStar(post.isStar());
 
         List<Comment> commentList = post.getComments();
-        //List<CommentWithoutPostDto> commentWithoutPostDtoList = new ArrayList<>();
-        //CommentWithoutPostDto commentWithoutPostDto = new CommentWithoutPostDto();
-
 
         List<CommentWithoutPostDto> listComments = new ArrayList<>();
         for (Comment comment : commentList) {
@@ -119,21 +109,6 @@ public class PostController {
         }
         postWithCommentsDto.setComments(listComments);
         return postWithCommentsDto;
-//
-//        CommentWithPostDto commentWithPostDto = new CommentWithPostDto();
-//        commentWithPostDto.setCommentId(comment.getCommentId());
-//        commentWithPostDto.setText(comment.getText());
-//        commentWithPostDto.setCreationDate(comment.getCreationDate());
-//
-//        Post post = comment.getPost();
-//        PostWithoutCommentDto postWithoutCommentDto = new PostWithoutCommentDto();
-//        postWithoutCommentDto.setPostId(post.getPostId());
-//        postWithoutCommentDto.setContent(post.getContent());
-//        postWithoutCommentDto.setStar(post.isStar());
-//        postWithoutCommentDto.setTitle(post.getTitle());
-//
-//        commentWithPostDto.setPostWithoutCommentDto(postWithoutCommentDto);
-//        return commentWithPostDto;
     }
 
     private CommentWithoutPostDto toCommentWithoutPostDto(Comment comment) {
@@ -143,12 +118,4 @@ public class PostController {
         commentWithoutPostDto.setText(comment.getText());
         return commentWithoutPostDto;
     }
-
-//    @PostMapping("{id}/comments")
-//    public Comment addCommentToPostById(@RequestParam(value = "id", required = false) long id,
-//                                        @RequestBody Comment comment) {
-//        logger.info("in addCommentToPostById method");
-//        //comment.setPostId(id);
-//        return commentService.saveComment(id, comment);
-//    }
 }

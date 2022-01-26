@@ -32,17 +32,15 @@ public class CommentController {
         return commentWithPostDto;
     }
 
-
     //    GET /api/v1/posts/{id}/comments
     @GetMapping("/{id}/comments")
     public List<CommentWithoutPostDto> getCommentsByPostId(@PathVariable("id") long postId) {
         logger.info("in getCommentsById method");
         List<Comment> commentsByPostId = commentService.getCommentsByPostId(postId);
         List<CommentWithoutPostDto> listComments = new ArrayList<>();
-        for(Comment comment : commentsByPostId){
+        for (Comment comment : commentsByPostId) {
             listComments.add(toCommentWithoutPostDto(comment));
         }
-        //List<CommentWithoutPostDto> listOfComments = toCommentWithoutPostDto(commentsByPostId);
         logger.info("in getCommentsById method {}", commentsByPostId);
         return listComments;
 
@@ -51,7 +49,7 @@ public class CommentController {
     //    GET /api/v1/posts/{postId}/comment/{commentId}
     @GetMapping("/{postId}/comment/{commentId}")
     public CommentWithoutPostDto getCommentsByPostIdAndCommentId(@PathVariable("postId") long postId,
-                                                              @PathVariable("commentId") long commentId) {
+                                                                 @PathVariable("commentId") long commentId) {
         logger.info("in getCommentsByPostIdAndCommentId method");
         Comment commentFromDB = commentService.getCommentsByPostIdAndCommentId(postId, commentId);
 

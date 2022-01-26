@@ -106,27 +106,7 @@ class PostServiceTest {
     @Test
     @DisplayName("test delete one post by id passed successfully")
     void deletePostById() {
-//        List<String> postSomeList = new ArrayList<>();
-//        postSomeList.add("First");
-//        postSomeList.add("Second");
-//        postSomeList.add("Third");
-//        PostService newPostService = new PostServiceImp();
-//        PostService spy = spy(newPostService);
-        //Mockito.when(mock(postRepository.deletePostById(3L))).then(postSomeList.remove(2));
 
-//        int beforeDelete = postService.getAllPosts().size();
-//        int expectedBefore = 3;
-//        postService.deletePostById(3L);
-//        int afterDelete = postService.getAllPosts().size();
-//        int expectedAfter = 2;
-//        assertEquals(expectedBefore, beforeDelete);
-//        assertEquals(expectedAfter, afterDelete);
-        /*
-        PostService mockPostService = mock(PostServiceImp.class);
-        mockPostService.deletePostById(1L);
-        verify(mockPostService, times(1)).deletePostById(1L);
-
-         */
     }
 
     @Test
