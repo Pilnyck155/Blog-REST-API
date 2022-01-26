@@ -1,15 +1,20 @@
 package com.pilnyck.blogrestapi.controller;
 
+import com.pilnyck.blogrestapi.dto.CommentWithPostDto;
+import com.pilnyck.blogrestapi.dto.CommentWithoutPostDto;
+import com.pilnyck.blogrestapi.dto.PostWithCommentsDto;
+import com.pilnyck.blogrestapi.dto.PostWithoutCommentDto;
 import com.pilnyck.blogrestapi.entity.Comment;
 import com.pilnyck.blogrestapi.entity.Post;
-import com.pilnyck.blogrestapi.service.CommentService;
 import com.pilnyck.blogrestapi.service.PostService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/api/v1/posts")
@@ -50,10 +55,10 @@ public class PostController {
     }
 
 
-    @PutMapping("/{id}")
-    public Post editPostById(@RequestBody Post post, @PathVariable long id) {
+    @PutMapping("/{postId}")
+    public Post editPostById(@RequestBody Post post, @PathVariable long postId) {
         logger.info("editPostById");
-        return postService.editPostById(post, id);
+        return postService.editPostById(post, postId);
     }
 
 
@@ -66,21 +71,77 @@ public class PostController {
     }
 
     @GetMapping("/star")
-    public List<Post> getAllPostsWithStar(){
+    public List<Post> getAllPostsWithStar() {
         logger.info("getAllPostsWithStar");
         return postService.getAllPostsWithStar();
     }
 
     @PutMapping("/{id}/star")
-    public Post addStarToPost(@PathVariable("id") long id){
+    public Post addStarToPost(@PathVariable("id") long id) {
         logger.info("addStarToPost");
         return postService.addStarToPost(id);
     }
 
     @DeleteMapping("/{id}/star")
-    public Post deleteStarFromPost(@PathVariable("id") long id){
+    public Post deleteStarFromPost(@PathVariable("id") long id) {
         logger.info("deleteStarFromPost");
         return postService.deleteStarFromPost(id);
+    }
+
+    @GetMapping("/{id}/full")
+    public PostWithCommentsDto getPostWithAllComments(@PathVariable("id") long postId) {
+        Optional <Post> postFromDb = postService.getPostWithAllComments(postId);
+        if (!postFromDb.isPresent()){
+            throw new IllegalArgumentException("Post with current id doesn't exist");
+        }
+        Post post = postFromDb.get();
+        //Post postFromDb = postService.getPostWithAllComments(postId);
+        PostWithCommentsDto postWithCommentsDto = toPostWithCommentsDto(post);
+        return postWithCommentsDto;
+    }
+
+
+    private PostWithCommentsDto toPostWithCommentsDto(Post post) {
+        PostWithCommentsDto postWithCommentsDto = new PostWithCommentsDto();
+        postWithCommentsDto.setPostId(post.getPostId());
+        postWithCommentsDto.setContent(post.getContent());
+        postWithCommentsDto.setTitle(post.getTitle());
+        postWithCommentsDto.setStar(post.isStar());
+
+        List<Comment> commentList = post.getComments();
+        //List<CommentWithoutPostDto> commentWithoutPostDtoList = new ArrayList<>();
+        //CommentWithoutPostDto commentWithoutPostDto = new CommentWithoutPostDto();
+
+
+        List<CommentWithoutPostDto> listComments = new ArrayList<>();
+        for (Comment comment : commentList) {
+            listComments.add(toCommentWithoutPostDto(comment));
+        }
+        postWithCommentsDto.setComments(listComments);
+        return postWithCommentsDto;
+//
+//        CommentWithPostDto commentWithPostDto = new CommentWithPostDto();
+//        commentWithPostDto.setCommentId(comment.getCommentId());
+//        commentWithPostDto.setText(comment.getText());
+//        commentWithPostDto.setCreationDate(comment.getCreationDate());
+//
+//        Post post = comment.getPost();
+//        PostWithoutCommentDto postWithoutCommentDto = new PostWithoutCommentDto();
+//        postWithoutCommentDto.setPostId(post.getPostId());
+//        postWithoutCommentDto.setContent(post.getContent());
+//        postWithoutCommentDto.setStar(post.isStar());
+//        postWithoutCommentDto.setTitle(post.getTitle());
+//
+//        commentWithPostDto.setPostWithoutCommentDto(postWithoutCommentDto);
+//        return commentWithPostDto;
+    }
+
+    private CommentWithoutPostDto toCommentWithoutPostDto(Comment comment) {
+        CommentWithoutPostDto commentWithoutPostDto = new CommentWithoutPostDto();
+        commentWithoutPostDto.setCommentId(comment.getCommentId());
+        commentWithoutPostDto.setCreationDate(comment.getCreationDate());
+        commentWithoutPostDto.setText(comment.getText());
+        return commentWithoutPostDto;
     }
 
 //    @PostMapping("{id}/comments")

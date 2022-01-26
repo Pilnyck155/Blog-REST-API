@@ -3,6 +3,7 @@ package com.pilnyck.blogrestapi.service;
 import com.pilnyck.blogrestapi.entity.Post;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PostService {
     Post savePost(Post post);
@@ -13,7 +14,7 @@ public interface PostService {
 
     void deletePostById(long id);
 
-    Post editPostById(Post post, long id);
+    Post editPostById(Post post, long postId);
 
     List<Post> findAllPostsByTitle(String title);
 
@@ -24,4 +25,6 @@ public interface PostService {
     Post addStarToPost(long id);
 
     Post deleteStarFromPost(long id);
+
+    Optional <Post> getPostWithAllComments(long postId);
 }

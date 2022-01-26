@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class PostServiceImp implements PostService {
@@ -39,9 +40,9 @@ public class PostServiceImp implements PostService {
     }
 
     @Override
-    public Post editPostById(Post post, long id) {
+    public Post editPostById(Post post, long postId) {
         //TODO: Rewrite method and take one query to DB
-        Post postFromDB = postRepository.findById(id).get();
+        Post postFromDB = postRepository.findById(postId).get();
         if (Objects.nonNull(post.getTitle()) && !"".equalsIgnoreCase(post.getTitle())) {
             postFromDB.setTitle(post.getTitle());
         }
@@ -75,5 +76,11 @@ public class PostServiceImp implements PostService {
     @Override
     public Post deleteStarFromPost(long id) {
         return postRepository.updatePostByIdAndSetFalse(id);
+    }
+
+    @Override
+    public Optional<Post> getPostWithAllComments(long postId) {
+        return postRepository.findById(postId);
+
     }
 }

@@ -1,7 +1,9 @@
 package com.pilnyck.blogrestapi.controller;
 
+import com.pilnyck.blogrestapi.entity.Comment;
 import com.pilnyck.blogrestapi.entity.Post;
 import com.pilnyck.blogrestapi.service.PostService;
+import net.bytebuddy.dynamic.DynamicType;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +16,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -243,4 +249,45 @@ class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.star").value(false));
     }
+
+    //get post with all comments
+    @Test
+    @DisplayName("test get post with all comments passed successfully")
+    public void whenIdIsValid_thenReturnPostWithAllComments() throws Exception {
+        Post post = Post.builder()
+                .postId(1L)
+                .content("For start lear Java programing language you need learn Indian language")
+                .title("Start in Java")
+                .star(true)
+                .build();
+        Comment firstComment = Comment.builder()
+                .commentId(1L)
+                .creationDate(LocalDateTime.of(2022, Month.JANUARY, 10, 17, 43, 37, 5))
+                .text("This is Java!")
+                .post(post)
+                .build();
+        Comment secondComment = Comment.builder()
+                .commentId(2L)
+                .creationDate(LocalDateTime.of(2021, Month.FEBRUARY, 7, 11, 27, 18, 4))
+                .text("This is Python!")
+                .post(post)
+                .build();
+        List<Comment> commentList = List.of(firstComment, secondComment);
+        post.setComments(commentList);
+        Optional<Post> optionalPost = Optional.of(post);
+
+        when(postService.getPostWithAllComments(1L)).thenReturn(optionalPost);
+        //when(postService.getPostWithAllComments(1L)).thenReturn(optionalPost);
+        this.mockMvc.perform(MockMvcRequestBuilders
+                .get("/api/v1/posts/{id}/full", 1))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.size()").value(5))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.star").value(true))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Start in Java"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.comments.size()").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.comments.length()").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.comments[0].text").value("This is Java!"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.comments[1].text").value("This is Python!"));
+    }
+
 }
