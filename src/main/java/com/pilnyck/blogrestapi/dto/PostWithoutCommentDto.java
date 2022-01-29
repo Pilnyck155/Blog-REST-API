@@ -2,7 +2,6 @@ package com.pilnyck.blogrestapi.dto;
 
 import lombok.Data;
 
-import javax.persistence.Column;
 
 @Data
 public class PostWithoutCommentDto {

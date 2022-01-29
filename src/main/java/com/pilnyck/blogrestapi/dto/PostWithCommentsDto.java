@@ -1,6 +1,5 @@
 package com.pilnyck.blogrestapi.dto;
 
-import com.pilnyck.blogrestapi.entity.Comment;
 import lombok.Data;
 
 import java.util.List;

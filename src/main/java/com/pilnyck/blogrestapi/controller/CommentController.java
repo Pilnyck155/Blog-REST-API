@@ -18,43 +18,40 @@ import java.util.List;
 @RequestMapping("/api/v1/posts")
 public class CommentController {
     Logger logger = LoggerFactory.getLogger(getClass());
+    //TODO: DELETE ALL COMMENTS
 
     @Autowired
     private CommentService commentService;
 
-    //    POST /api/v1/posts/1/comments
     @PostMapping("/{id}/comments")
     public CommentWithPostDto addCommentToPostById(@PathVariable long id,
                                                    @RequestBody Comment comment) {
-        logger.info("in addCommentToPostById method");
+        logger.info("Add new comment by id {}", id);
         Comment commentFromDB = commentService.saveComment(id, comment);
         CommentWithPostDto commentWithPostDto = toCommentWithPostDto(commentFromDB);
         return commentWithPostDto;
     }
 
-    //    GET /api/v1/posts/{id}/comments
     @GetMapping("/{id}/comments")
-    public List<CommentWithoutPostDto> getCommentsByPostId(@PathVariable("id") long postId) {
-        logger.info("in getCommentsById method");
+    public List<CommentWithoutPostDto> getCommentsByPostId(@PathVariable long postId) {
+        logger.info("Obtain all comments by post id {}", postId);
         List<Comment> commentsByPostId = commentService.getCommentsByPostId(postId);
-        List<CommentWithoutPostDto> listComments = new ArrayList<>();
+        List<CommentWithoutPostDto> listComments = new ArrayList<>(commentsByPostId.size());
         for (Comment comment : commentsByPostId) {
             listComments.add(toCommentWithoutPostDto(comment));
         }
-        logger.info("in getCommentsById method {}", commentsByPostId);
         return listComments;
 
     }
 
-    //    GET /api/v1/posts/{postId}/comment/{commentId}
     @GetMapping("/{postId}/comment/{commentId}")
-    public CommentWithoutPostDto getCommentsByPostIdAndCommentId(@PathVariable("postId") long postId,
-                                                                 @PathVariable("commentId") long commentId) {
-        logger.info("in getCommentsByPostIdAndCommentId method");
-        Comment commentFromDB = commentService.getCommentsByPostIdAndCommentId(postId, commentId);
+    //TODO: Rewrite method by using only commentId
+    public CommentWithoutPostDto getCommentByPostIdAndCommentId(@PathVariable long postId,
+                                                                @PathVariable long commentId) {
+        logger.info("Obtain all comments by post id {} and comment id {}", postId, commentId);
+        Comment commentFromDB = commentService.getCommentByPostIdAndCommentId(postId, commentId);
 
         CommentWithoutPostDto commentWithoutPostDto = toCommentWithoutPostDto(commentFromDB);
-        logger.info("in getCommentsByPostIdAndCommentId method {}", commentWithoutPostDto);
         return commentWithoutPostDto;
     }
 

@@ -13,7 +13,6 @@ import java.util.List;
 
 @Service
 public class DefaultCommentService implements CommentService {
-    Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private CommentRepository commentRepository;
@@ -27,7 +26,6 @@ public class DefaultCommentService implements CommentService {
         //TODO: Add Optional when return Post from DB
         comment.setPost(postFromDB);
         Comment savedComment = commentRepository.save(comment);
-        //logger.info("comment from DB {}", savedComment);
         return savedComment;
     }
 
@@ -35,12 +33,11 @@ public class DefaultCommentService implements CommentService {
     public List<Comment> getCommentsByPostId(long postId) {
         Post postFromDB = postRepository.getById(postId);
         List<Comment> commentsFromPost = postFromDB.getComments();
-        //logger.info("comments by post id {}", commentsFromPost);
         return commentsFromPost;
     }
 
     @Override
-    public Comment getCommentsByPostIdAndCommentId(long postId, long commentId) {
+    public Comment getCommentByPostIdAndCommentId(long postId, long commentId) {
         Comment byPostIdAndCommentId = commentRepository.findCommentByPostIdAndCommentId(postId, commentId);
         return byPostIdAndCommentId;
     }

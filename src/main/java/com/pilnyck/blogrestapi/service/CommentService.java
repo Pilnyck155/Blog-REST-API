@@ -1,7 +1,6 @@
 package com.pilnyck.blogrestapi.service;
 
 import com.pilnyck.blogrestapi.entity.Comment;
-import com.pilnyck.blogrestapi.entity.Post;
 
 import java.util.List;
 
@@ -11,5 +10,5 @@ public interface CommentService {
 
     List<Comment> getCommentsByPostId(long postId);
 
-    Comment getCommentsByPostIdAndCommentId(long postId, long commentId);
+    Comment getCommentByPostIdAndCommentId(long postId, long commentId);
 }

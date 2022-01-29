@@ -32,12 +32,11 @@ public class PostController {
     @GetMapping
     public List<Post> getAllPosts(@RequestParam(value = "title", required = false) String title,
                                   @RequestParam(value = "sort", required = false) String sort) {
-        logger.info("getAllPostsMethod");
         if (title != null) {
-            logger.info("in findAllPostsByTitle method");
+            logger.info("Obtain all posts by title {}", title);
             return postService.findAllPostsByTitle(title);
         } else if (sort != null) {
-            logger.info("in findAllPostsSortedByTitle method");
+            logger.info("Obtain all sorted posts by sort {}", sort);
             return postService.findAllPostsSortedByTitle();
         } else {
             return postService.getAllPosts();
@@ -45,45 +44,45 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public Post getById(@PathVariable("id") long id) {
-        logger.info("getById");
+    public Post getById(@PathVariable long id) {
+        logger.info("Obtain post by id {}", id);
         return postService.getById(id);
     }
 
     @PutMapping("/{postId}")
     public Post editPostById(@RequestBody Post post, @PathVariable long postId) {
-        logger.info("editPostById");
+        logger.info("Change post by id {}", postId);
         return postService.editPostById(post, postId);
     }
 
     @DeleteMapping("/{id}")
-    public String deletePostById(@PathVariable("id") long id) {
-        logger.info("deletePostById");
+    public String deletePostById(@PathVariable long id) {
+        logger.info("Delete post by id {}", id);
         // TODO: Change method to void
         postService.deletePostById(id);
-        return "Post delete sucсessful";
+        return "Post delete sucсessfullly";
     }
 
     @GetMapping("/star")
     public List<Post> getAllPostsWithStar() {
-        logger.info("getAllPostsWithStar");
+        logger.info("Obtain all posts with star");
         return postService.getAllPostsWithStar();
     }
 
     @PutMapping("/{id}/star")
-    public Post addStarToPost(@PathVariable("id") long id) {
-        logger.info("addStarToPost");
+    public Post addStarToPost(@PathVariable long id) {
+        logger.info("Add star to  post by id {}", id);
         return postService.addStarToPost(id);
     }
 
     @DeleteMapping("/{id}/star")
-    public Post deleteStarFromPost(@PathVariable("id") long id) {
-        logger.info("deleteStarFromPost");
+    public Post deleteStarFromPost(@PathVariable long id) {
+        logger.info("Delete star from post by id {}", id);
         return postService.deleteStarFromPost(id);
     }
 
     @GetMapping("/{id}/full")
-    public PostWithCommentsDto getPostWithAllComments(@PathVariable("id") long postId) {
+    public PostWithCommentsDto getPostWithAllComments(@PathVariable long postId) {
         Optional<Post> postFromDb = postService.getPostWithAllComments(postId);
         if (!postFromDb.isPresent()) {
             throw new IllegalArgumentException("Post with current id doesn't exist");

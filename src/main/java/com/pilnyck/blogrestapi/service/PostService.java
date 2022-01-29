@@ -26,5 +26,5 @@ public interface PostService {
 
     Post deleteStarFromPost(long id);
 
-    Optional <Post> getPostWithAllComments(long postId);
+    Optional<Post> getPostWithAllComments(long postId);
 }

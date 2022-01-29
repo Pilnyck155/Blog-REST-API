@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 @WebMvcTest(PostController.class)
 class PostControllerTest {
+    //TODO: Add more tests
 
     @MockBean
     private PostService postService;
@@ -50,8 +51,7 @@ class PostControllerTest {
                         .content("{\"title\": \"Sport\", \"content\": \"Dynamo wins again\"}"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Sport"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Dynamo wins again"))
-                .andDo(MockMvcResultHandlers.print());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Dynamo wins again"));
         verify(postService).savePost(any(Post.class));
     }
 
@@ -76,8 +76,7 @@ class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.size()", Matchers.is(2)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("Animals"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("Fresh news"))
-                .andDo(MockMvcResultHandlers.print());
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("Fresh news"));
     }
 
     @Test
@@ -106,8 +105,7 @@ class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.size()", Matchers.is(2)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("Animals"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("Animals"))
-                .andDo(MockMvcResultHandlers.print());
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("Animals"));
     }
 
 
@@ -138,8 +136,7 @@ class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.size()", Matchers.is(3)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("Animals"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("Documents"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[2].title").value("Politics"))
-                .andDo(MockMvcResultHandlers.print());
+                .andExpect(MockMvcResultMatchers.jsonPath("$[2].title").value("Politics"));
     }
 
 
@@ -156,8 +153,7 @@ class PostControllerTest {
                         .get("/api/v1/posts/{id}", 1))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Animals"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("The elephant escaped from zoo"))
-                .andDo(MockMvcResultHandlers.print());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("The elephant escaped from zoo"));
     }
 
     @Test
@@ -176,8 +172,7 @@ class PostControllerTest {
                         .content("{\"title\": \"Sport\", \"content\": \"Dynamo wins again\"}"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Sport"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Dynamo wins again"))
-                .andDo(MockMvcResultHandlers.print());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Dynamo wins again"));
     }
 
     @Test
@@ -186,8 +181,7 @@ class PostControllerTest {
         this.mockMvc.perform(MockMvcRequestBuilders
                         .delete("/api/v1/posts/{id}", 1))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("Post delete sucсessful"))
-                .andDo(MockMvcResultHandlers.print());
+                .andExpect(MockMvcResultMatchers.content().string("Post delete successfully"));
     }
 
 
@@ -214,8 +208,7 @@ class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.size()", Matchers.is(2)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].star").value(true))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].star").isBoolean())
-                .andDo(MockMvcResultHandlers.print());
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].star").isBoolean());
     }
 
 
@@ -286,5 +279,4 @@ class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.comments[0].text").value("This is Java!"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.comments[1].text").value("This is Python!"));
     }
-
 }
