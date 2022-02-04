@@ -24,22 +24,15 @@ public class DefaultTagService implements TagService {
     @Autowired
     private PostRepository postRepository;
 
-    //@Transactional
     @Override
     public void saveTagByPostId(Tag tag, long postId) {
-//        Post postFromDB = postRepository.getById(postId);
-//        tag.setPosts(Set.of(postFromDB));
-//        tagRepository.save(tag);
-
         Post postFromDB = postRepository.getById(postId);
-        //postFromDB.setTags(Set.of(tag));
+
+        postFromDB.getTags().add(tag);
+        tag.getPosts().add(postFromDB);
 
         tagRepository.save(tag);
-        ///postFromDB.getTags().add(tag);
-        Set<Tag> postFromDBTags = postFromDB.getTags();
-        postFromDBTags.add(tag);
-        //postFromDB.setTags(Set.of(tag));
-        //postRepository.save(postFromDB);
+        postRepository.save(postFromDB);
     }
 
     @Override

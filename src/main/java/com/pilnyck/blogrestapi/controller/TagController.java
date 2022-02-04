@@ -22,16 +22,16 @@ public class TagController {
     @Autowired
     private TagService tagService;
 
-    @Autowired
-    private PostService postService;
 
     @PostMapping("/{postId}/tags")
     private void saveTagByPostId(@RequestBody Tag tag, @PathVariable long postId) {
+        logger.info("Save tag by postId {}", postId);
         tagService.saveTagByPostId(tag, postId);
     }
 
     @GetMapping("/tags")
     private List<TagWithoutPostsDto> findAllTags() {
+        logger.info("Obtain list of all tags");
         List<TagWithoutPostsDto> listOfTags = tagService.findAllTags();
         return listOfTags;
     }
@@ -44,6 +44,7 @@ public class TagController {
 
     @DeleteMapping("tags/{tagId}")
     private void deleteTagById(@PathVariable long tagId) {
+        logger.info("Delete tag by tagId {}", tagId);
         tagService.deleteTagById(tagId);
     }
 }
