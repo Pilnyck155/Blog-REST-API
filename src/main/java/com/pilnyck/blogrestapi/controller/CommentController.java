@@ -32,7 +32,7 @@ public class CommentController {
         return commentWithPostDto;
     }
 
-    @GetMapping("/{id}/comments")
+    @GetMapping("/{postId}/comments")
     public List<CommentWithoutPostDto> getCommentsByPostId(@PathVariable long postId) {
         logger.info("Obtain all comments by post id {}", postId);
         List<Comment> commentsByPostId = commentService.getCommentsByPostId(postId);

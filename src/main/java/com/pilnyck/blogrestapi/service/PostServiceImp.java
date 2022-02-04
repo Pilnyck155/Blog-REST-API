@@ -80,7 +80,8 @@ public class PostServiceImp implements PostService {
 
     @Override
     public Optional<Post> getPostWithAllComments(long postId) {
-        return postRepository.findById(postId);
+        Optional<Post> postRepositoryById = postRepository.findById(postId);
+        return postRepositoryById;
 
     }
 }

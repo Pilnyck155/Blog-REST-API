@@ -42,7 +42,7 @@ public class Post {
     @JoinColumn(name = "post_id", referencedColumnName = "postId")
     private List<Comment> comments;
 
-    @ManyToMany(mappedBy = "posts", cascade = CascadeType.REFRESH)
+    @ManyToMany(mappedBy = "posts")
     private Set<Tag> tags = new LinkedHashSet<>();
 
     public Set<Tag> getTags() {

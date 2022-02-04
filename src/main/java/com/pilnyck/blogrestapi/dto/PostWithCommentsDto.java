@@ -1,8 +1,11 @@
 package com.pilnyck.blogrestapi.dto;
 
+import com.pilnyck.blogrestapi.entity.Tag;
 import lombok.Data;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class PostWithCommentsDto {
@@ -11,4 +14,5 @@ public class PostWithCommentsDto {
     private String content;
     private boolean star;
     private List<CommentWithoutPostDto> comments;
+    private Set<TagWithoutPostsDto> tags;
 }

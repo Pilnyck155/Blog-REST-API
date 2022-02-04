@@ -1,20 +1,16 @@
 package com.pilnyck.blogrestapi.controller;
 
-import com.pilnyck.blogrestapi.dto.CommentWithPostDto;
-import com.pilnyck.blogrestapi.dto.CommentWithoutPostDto;
-import com.pilnyck.blogrestapi.dto.PostWithCommentsDto;
-import com.pilnyck.blogrestapi.dto.PostWithoutCommentDto;
+import com.pilnyck.blogrestapi.dto.*;
 import com.pilnyck.blogrestapi.entity.Comment;
 import com.pilnyck.blogrestapi.entity.Post;
+import com.pilnyck.blogrestapi.entity.Tag;
 import com.pilnyck.blogrestapi.service.PostService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping(path = "/api/v1/posts")
@@ -60,7 +56,7 @@ public class PostController {
         logger.info("Delete post by id {}", id);
         // TODO: Change method to void
         postService.deletePostById(id);
-        return "Post delete sucсessfullly";
+        return "Post delete successfully";
     }
 
     @GetMapping("/star")
@@ -81,7 +77,7 @@ public class PostController {
         return postService.deleteStarFromPost(id);
     }
 
-    @GetMapping("/{id}/full")
+    @GetMapping("/{postId}/full")
     public PostWithCommentsDto getPostWithAllComments(@PathVariable long postId) {
         Optional<Post> postFromDb = postService.getPostWithAllComments(postId);
         if (!postFromDb.isPresent()) {
@@ -101,12 +97,19 @@ public class PostController {
         postWithCommentsDto.setStar(post.isStar());
 
         List<Comment> commentList = post.getComments();
-
         List<CommentWithoutPostDto> listComments = new ArrayList<>();
         for (Comment comment : commentList) {
             listComments.add(toCommentWithoutPostDto(comment));
         }
         postWithCommentsDto.setComments(listComments);
+
+        Set<TagWithoutPostsDto> tagWithoutPostsDtos = new LinkedHashSet<>();
+        Set<Tag> tags = post.getTags();
+        for (Tag tag : tags){
+            tagWithoutPostsDtos.add(toTagWithoutPostsDto(tag));
+        }
+        postWithCommentsDto.setTags(tagWithoutPostsDtos);
+
         return postWithCommentsDto;
     }
 
@@ -116,5 +119,12 @@ public class PostController {
         commentWithoutPostDto.setCreationDate(comment.getCreationDate());
         commentWithoutPostDto.setText(comment.getText());
         return commentWithoutPostDto;
+    }
+
+    private TagWithoutPostsDto toTagWithoutPostsDto(Tag tag) {
+        TagWithoutPostsDto tagWithoutPostsDto = new TagWithoutPostsDto();
+        tagWithoutPostsDto.setTagId(tag.getTagId());
+        tagWithoutPostsDto.setTagName(tag.getTagName());
+        return tagWithoutPostsDto;
     }
 }
