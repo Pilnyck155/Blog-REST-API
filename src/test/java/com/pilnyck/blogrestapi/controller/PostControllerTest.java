@@ -2,6 +2,7 @@ package com.pilnyck.blogrestapi.controller;
 
 import com.pilnyck.blogrestapi.entity.Comment;
 import com.pilnyck.blogrestapi.entity.Post;
+import com.pilnyck.blogrestapi.entity.Tag;
 import com.pilnyck.blogrestapi.service.PostService;
 import net.bytebuddy.dynamic.DynamicType;
 import org.hamcrest.Matchers;
@@ -21,10 +22,11 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.*;
 
 @WebMvcTest(PostController.class)
 class PostControllerTest {
@@ -56,6 +58,32 @@ class PostControllerTest {
     }
 
     @Test
+    @DisplayName("test save post with tag passed successfully")
+    void whenDataIsValid_thenSavePostWithTag() throws Exception {
+        Tag tag = Tag.builder()
+                .tagId(7L)
+                .tagName("Football")
+                .build();
+        Post post = Post.builder()
+                .title("Sport")
+                .content("Dynamo wins again")
+                .star(true)
+                .tags(Set.of(tag))
+                .build();
+
+        when(postService.savePost(any())).thenReturn(post);
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .post("/api/v1/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\": \"Sport\", \"content\": \"Dynamo wins again\"}"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Sport"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tags[0].tagName").value("Football"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Dynamo wins again"));
+        verify(postService).savePost(any(Post.class));
+    }
+
+    @Test
     @DisplayName("test get all posts passed successfully")
     void whenMethodIsCall_thenReturnAllPosts() throws Exception {
         Post post = Post.builder()
@@ -79,10 +107,19 @@ class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("Fresh news"));
     }
 
+
     @Test
-    @DisplayName("test get all posts with title passed successfully")
-    void whenMethodCallWithTitleParam_thenReturnAllPostsWithCurrentTitle() throws Exception {
-        Post post = Post.builder()
+    @DisplayName("test get all posts with comments and tags passed successfully")
+    void whenMethodIsCall_thenReturnAllPostsWithCommentsAndTags() throws Exception {
+        Tag firstTag = Tag.builder()
+                .tagId(7L)
+                .tagName("zoo")
+                .build();
+        Tag secondTag = Tag.builder()
+                .tagId(8L)
+                .tagName("stupid")
+                .build();
+        Post firstPost = Post.builder()
                 .postId(1L)
                 .title("Animals")
                 .content("The elephant escaped from zoo")
@@ -91,6 +128,30 @@ class PostControllerTest {
                 .postId(2L)
                 .title("Fresh news")
                 .content("Fresh stupid news")
+                .build();
+
+        firstPost.setTags(Set.of(firstTag));
+        secondPost.setTags(Set.of(secondTag));
+
+        when(postService.getAllPosts()).thenReturn(List.of(firstPost, secondPost));
+        this.mockMvc
+                .perform(MockMvcRequestBuilders
+                        .get("/api/v1/posts"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.size()", Matchers.is(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("Animals"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("Fresh news"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].tags[0].tagName").value("zoo"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].tags[0].tagName").value("stupid"));
+    }
+
+    @Test
+    @DisplayName("test get all posts with title passed successfully")
+    void whenMethodCallWithTitleParam_thenReturnAllPostsWithCurrentTitle() throws Exception {
+        Post post = Post.builder()
+                .postId(1L)
+                .title("Animals")
+                .content("The elephant escaped from zoo")
                 .build();
         Post thirdPost = Post.builder()
                 .postId(3L)
@@ -156,11 +217,13 @@ class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("The elephant escaped from zoo"));
     }
 
+    //problems with this test
     @Test
     @DisplayName("test edit post by id passed successfully")
     void whenDataIsValid_thenSaveEditPost_andReturnEditedPost() throws Exception {
         long id = 1L;
         Post post = Post.builder()
+                .postId(id)
                 .title("Sport")
                 .content("Dynamo wins again")
                 .build();
@@ -173,6 +236,32 @@ class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Sport"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Dynamo wins again"));
+    }
+
+    //problems with this test
+    @Test
+    @DisplayName("test edit post by id with tags passed successfully")
+    void whenDataIsValid_thenSaveEditPostWithTags_andReturnEditedPostWithTags() throws Exception {
+        Tag firstTag = Tag.builder()
+                .tagId(11L)
+                .tagName("stupid")
+                .build();
+        Post post = Post.builder()
+                .postId(1L)
+                .title("Sport")
+                .content("Dynamo wins again")
+                .build();
+        post.setTags(Set.of(firstTag));
+        when(postService.editPostById(isA(Post.class), isA(Long.class))).thenReturn(post);
+        //verify(postService, times(1)).editPostById(post, 1);
+
+        this.mockMvc.perform(MockMvcRequestBuilders
+                        .put("/api/v1/posts/{id}", 1)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Sport"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Dynamo wins again"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tags[0].tagName").value("stupid"));
     }
 
     @Test
@@ -263,20 +352,26 @@ class PostControllerTest {
                 .text("This is Python!")
                 .post(post)
                 .build();
+        Tag tag = Tag.builder()
+                .tagId(7L)
+                .tagName("Programing language")
+                .build();
         List<Comment> commentList = List.of(firstComment, secondComment);
         post.setComments(commentList);
+        post.setTags(Set.of(tag));
         Optional<Post> optionalPost = Optional.of(post);
 
         when(postService.getPostWithAllComments(1L)).thenReturn(optionalPost);
         this.mockMvc.perform(MockMvcRequestBuilders
-                .get("/api/v1/posts/{id}/full", 1))
+                        .get("/api/v1/posts/{id}/full", 1))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.size()").value(5))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.size()").value(6))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.star").value(true))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Start in Java"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.comments.size()").value(2))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.comments.length()").value(2))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.comments[0].text").value("This is Java!"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.comments[1].text").value("This is Python!"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.comments[1].text").value("This is Python!"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tags[0].tagName").value("Programing language"));
     }
 }

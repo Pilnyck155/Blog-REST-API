@@ -1,16 +1,16 @@
 package com.pilnyck.blogrestapi.service;
 
 import com.pilnyck.blogrestapi.entity.Post;
+import com.pilnyck.blogrestapi.entity.Tag;
 import com.pilnyck.blogrestapi.repository.PostRepository;
+import com.pilnyck.blogrestapi.repository.TagRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PostServiceImp implements PostService {
@@ -19,9 +19,17 @@ public class PostServiceImp implements PostService {
     @Autowired
     private PostRepository postRepository;
 
+    @Autowired
+    private TagRepository tagRepository;
+
     @Override
     public Post savePost(Post post) {
-        return postRepository.save(post);
+        Set<Tag> postTags = post.getTags();
+        List<Tag> savedTags = tagRepository.saveAll(postTags);
+        Set<Tag> targetTagsSet = new HashSet<>(savedTags);
+        post.setTags(targetTagsSet);
+        Post savedPost = postRepository.save(post);
+        return savedPost;
     }
 
     @Override
@@ -41,15 +49,9 @@ public class PostServiceImp implements PostService {
 
     @Override
     public Post editPostById(Post post, long postId) {
-        //TODO: Rewrite method and take one query to DB
-        Post postFromDB = postRepository.findById(postId).get();
-        if (Objects.nonNull(post.getTitle()) && !"".equalsIgnoreCase(post.getTitle())) {
-            postFromDB.setTitle(post.getTitle());
-        }
-        if (Objects.nonNull(post.getContent()) && !"".equalsIgnoreCase(post.getContent())) {
-            postFromDB.setContent(post.getContent());
-        }
-        return postRepository.save(postFromDB);
+        post.setPostId(postId);
+        Post savedPost = savePost(post);
+        return savedPost;
     }
 
     @Override

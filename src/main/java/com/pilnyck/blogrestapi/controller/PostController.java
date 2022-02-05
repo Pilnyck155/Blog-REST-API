@@ -20,11 +20,15 @@ public class PostController {
     @Autowired
     private PostService postService;
 
+    //TODO: Change from Post to PostWithCommentsDto
     @PostMapping
-    public Post savePost(@RequestBody Post post) {
-        return postService.savePost(post);
+    public PostWithCommentsDto savePost(@RequestBody Post post) {
+        Post savePost = postService.savePost(post);
+        PostWithCommentsDto postWithCommentsDto = toPostWithCommentsDto(savePost);
+        return postWithCommentsDto;
     }
 
+    //TODO: Change from Post to PostWithCommentsDto
     @GetMapping
     public List<Post> getAllPosts(@RequestParam(value = "title", required = false) String title,
                                   @RequestParam(value = "sort", required = false) String sort) {
@@ -39,38 +43,45 @@ public class PostController {
         }
     }
 
+    //TODO: Change from Post to PostWithCommentsDto
     @GetMapping("/{id}")
     public Post getById(@PathVariable long id) {
         logger.info("Obtain post by id {}", id);
         return postService.getById(id);
     }
 
+    //TODO: Change from Post to PostWithCommentsDto
     @PutMapping("/{postId}")
-    public Post editPostById(@RequestBody Post post, @PathVariable long postId) {
+    public PostWithCommentsDto editPostById(@RequestBody Post post, @PathVariable long postId) {
         logger.info("Change post by id {}", postId);
-        return postService.editPostById(post, postId);
+        Post editedPost = postService.editPostById(post, postId);
+        PostWithCommentsDto postWithCommentsDto = toPostWithCommentsDto(editedPost);
+        return postWithCommentsDto;
     }
 
     @DeleteMapping("/{id}")
     public String deletePostById(@PathVariable long id) {
-        logger.info("Delete post by id {}", id);
         // TODO: Change method to void
+        logger.info("Delete post by id {}", id);
         postService.deletePostById(id);
         return "Post delete successfully";
     }
 
+    //TODO: Change from Post to PostWithCommentsDto
     @GetMapping("/star")
     public List<Post> getAllPostsWithStar() {
         logger.info("Obtain all posts with star");
         return postService.getAllPostsWithStar();
     }
 
+    //TODO: Change from Post to PostWithCommentsDto
     @PutMapping("/{id}/star")
     public Post addStarToPost(@PathVariable long id) {
         logger.info("Add star to  post by id {}", id);
         return postService.addStarToPost(id);
     }
 
+    //TODO: Change from Post to PostWithCommentsDto
     @DeleteMapping("/{id}/star")
     public Post deleteStarFromPost(@PathVariable long id) {
         logger.info("Delete star from post by id {}", id);
@@ -97,15 +108,18 @@ public class PostController {
         postWithCommentsDto.setStar(post.isStar());
 
         List<Comment> commentList = post.getComments();
-        List<CommentWithoutPostDto> listComments = new ArrayList<>();
-        for (Comment comment : commentList) {
-            listComments.add(toCommentWithoutPostDto(comment));
+        if (commentList != null) {
+            List<CommentWithoutPostDto> listComments = new ArrayList<>();
+            for (Comment comment : commentList) {
+                listComments.add(toCommentWithoutPostDto(comment));
+            }
+            postWithCommentsDto.setComments(listComments);
         }
-        postWithCommentsDto.setComments(listComments);
+
 
         Set<TagWithoutPostsDto> tagWithoutPostsDtos = new LinkedHashSet<>();
         Set<Tag> tags = post.getTags();
-        for (Tag tag : tags){
+        for (Tag tag : tags) {
             tagWithoutPostsDtos.add(toTagWithoutPostsDto(tag));
         }
         postWithCommentsDto.setTags(tagWithoutPostsDtos);
