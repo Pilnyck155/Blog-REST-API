@@ -20,7 +20,6 @@ public class PostController {
     @Autowired
     private PostService postService;
 
-    //TODO: Change from Post to PostWithCommentsDto
     @PostMapping
     public PostWithCommentsDto savePost(@RequestBody Post post) {
         Post savePost = postService.savePost(post);
@@ -28,29 +27,34 @@ public class PostController {
         return postWithCommentsDto;
     }
 
-    //TODO: Change from Post to PostWithCommentsDto
     @GetMapping
-    public List<Post> getAllPosts(@RequestParam(value = "title", required = false) String title,
-                                  @RequestParam(value = "sort", required = false) String sort) {
+    public List<PostWithoutCommentDto> getAllPosts(@RequestParam(value = "title", required = false) String title,
+                                                   @RequestParam(value = "sort", required = false) String sort) {
         if (title != null) {
             logger.info("Obtain all posts by title {}", title);
-            return postService.findAllPostsByTitle(title);
+            List<Post> allPostsByTitle = postService.findAllPostsByTitle(title);
+            List<PostWithoutCommentDto> listPostsWithoutCommentsDtoById = toListPostWithoutCommentDto(allPostsByTitle);
+            return listPostsWithoutCommentsDtoById;
         } else if (sort != null) {
             logger.info("Obtain all sorted posts by sort {}", sort);
-            return postService.findAllPostsSortedByTitle();
+            List<Post> allPostsSortedByTitle = postService.findAllPostsSortedByTitle();
+            List<PostWithoutCommentDto> listPostsWithoutCommentsDtoSortedByTitle = toListPostWithoutCommentDto(allPostsSortedByTitle);
+            return listPostsWithoutCommentsDtoSortedByTitle;
         } else {
-            return postService.getAllPosts();
+            List<Post> allPosts = postService.getAllPosts();
+            List<PostWithoutCommentDto> listPostsWithoutCommentsDTO = toListPostWithoutCommentDto(allPosts);
+            return listPostsWithoutCommentsDTO;
         }
     }
 
-    //TODO: Change from Post to PostWithCommentsDto
     @GetMapping("/{id}")
-    public Post getById(@PathVariable long id) {
+    public PostWithCommentsDto getById(@PathVariable long id) {
         logger.info("Obtain post by id {}", id);
-        return postService.getById(id);
+        Post byId = postService.getById(id);
+        PostWithCommentsDto postWithCommentsDtoById = toPostWithCommentsDto(byId);
+        return postWithCommentsDtoById;
     }
 
-    //TODO: Change from Post to PostWithCommentsDto
     @PutMapping("/{postId}")
     public PostWithCommentsDto editPostById(@RequestBody Post post, @PathVariable long postId) {
         logger.info("Change post by id {}", postId);
@@ -60,32 +64,33 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
-    public String deletePostById(@PathVariable long id) {
-        // TODO: Change method to void
+    public void deletePostById(@PathVariable long id) {
         logger.info("Delete post by id {}", id);
         postService.deletePostById(id);
-        return "Post delete successfully";
     }
 
-    //TODO: Change from Post to PostWithCommentsDto
     @GetMapping("/star")
-    public List<Post> getAllPostsWithStar() {
+    public List<PostWithoutCommentDto> getAllPostsWithStar() {
         logger.info("Obtain all posts with star");
-        return postService.getAllPostsWithStar();
+        List<Post> allPostsWithStar = postService.getAllPostsWithStar();
+        List<PostWithoutCommentDto> listPostsWithoutCommentsDtoWithStar = toListPostWithoutCommentDto(allPostsWithStar);
+        return listPostsWithoutCommentsDtoWithStar;
     }
 
-    //TODO: Change from Post to PostWithCommentsDto
     @PutMapping("/{id}/star")
-    public Post addStarToPost(@PathVariable long id) {
+    public PostWithoutCommentDto addStarToPost(@PathVariable long id) {
         logger.info("Add star to  post by id {}", id);
-        return postService.addStarToPost(id);
+        Post post = postService.addStarToPost(id);
+        PostWithoutCommentDto postWithoutCommentDto = toPostWithoutCommentDto(post);
+        return postWithoutCommentDto;
     }
 
-    //TODO: Change from Post to PostWithCommentsDto
     @DeleteMapping("/{id}/star")
-    public Post deleteStarFromPost(@PathVariable long id) {
+    public PostWithoutCommentDto deleteStarFromPost(@PathVariable long id) {
         logger.info("Delete star from post by id {}", id);
-        return postService.deleteStarFromPost(id);
+        Post post = postService.deleteStarFromPost(id);
+        PostWithoutCommentDto postWithoutCommentDto = toPostWithoutCommentDto(post);
+        return postWithoutCommentDto;
     }
 
     @GetMapping("/{postId}/full")
@@ -116,7 +121,6 @@ public class PostController {
             postWithCommentsDto.setComments(listComments);
         }
 
-
         Set<TagWithoutPostsDto> tagWithoutPostsDtos = new LinkedHashSet<>();
         Set<Tag> tags = post.getTags();
         for (Tag tag : tags) {
@@ -140,5 +144,22 @@ public class PostController {
         tagWithoutPostsDto.setTagId(tag.getTagId());
         tagWithoutPostsDto.setTagName(tag.getTagName());
         return tagWithoutPostsDto;
+    }
+
+    private PostWithoutCommentDto toPostWithoutCommentDto(Post post) {
+        PostWithoutCommentDto postWithoutCommentDto = new PostWithoutCommentDto();
+        postWithoutCommentDto.setPostId(post.getPostId());
+        postWithoutCommentDto.setContent(post.getContent());
+        postWithoutCommentDto.setTitle(post.getTitle());
+        postWithoutCommentDto.setStar(post.isStar());
+        return postWithoutCommentDto;
+    }
+
+    private List<PostWithoutCommentDto> toListPostWithoutCommentDto(List<Post> postList) {
+        List<PostWithoutCommentDto> postWithoutCommentsDtoList = new ArrayList<>(postList.size());
+        for (Post post : postList) {
+            postWithoutCommentsDtoList.add(toPostWithoutCommentDto(post));
+        }
+        return postWithoutCommentsDtoList;
     }
 }

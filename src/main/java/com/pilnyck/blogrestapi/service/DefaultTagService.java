@@ -18,11 +18,14 @@ import java.util.Set;
 @Service
 public class DefaultTagService implements TagService {
 
-    @Autowired
-    private TagRepository tagRepository;
+    private final TagRepository tagRepository;
 
-    @Autowired
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
+
+    public DefaultTagService(TagRepository tagRepository, PostRepository postRepository) {
+        this.tagRepository = tagRepository;
+        this.postRepository = postRepository;
+    }
 
     @Override
     public void saveTagByPostId(Tag tag, long postId) {
@@ -49,27 +52,6 @@ public class DefaultTagService implements TagService {
     public void deleteTagById(long tagId) {
         tagRepository.deleteById(tagId);
     }
-
-//    @Override
-//    public List<PostWithoutCommentDto> findAllPostsByTag(String tagName) {
-//        List<Post> postsFromDB = tagRepository.findByTag(tagName);
-//        List<PostWithoutCommentDto> listPostWithoutCommentsDTO = new ArrayList<>();
-//        for (Post post : postsFromDB){
-//            listPostWithoutCommentsDTO.add(toPostWithoutCommentDto(post));
-//
-//        }
-//
-//        return listPostWithoutCommentsDTO;
-//    }
-//
-//    private PostWithoutCommentDto toPostWithoutCommentDto(Post post) {
-//        PostWithoutCommentDto postWithoutCommentDto = new PostWithoutCommentDto();
-//        postWithoutCommentDto.setPostId(post.getPostId());
-//        postWithoutCommentDto.setContent(post.getContent());
-//        postWithoutCommentDto.setTitle(post.getTitle());
-//        postWithoutCommentDto.setStar(post.isStar());
-//        return null;
-//    }
 
     private TagWithoutPostsDto toTagWithoutPostsDto(Tag tag) {
         TagWithoutPostsDto tagWithoutPostsDto = new TagWithoutPostsDto();
