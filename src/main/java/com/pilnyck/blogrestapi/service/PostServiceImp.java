@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class PostServiceImp implements PostService {
@@ -25,11 +28,22 @@ public class PostServiceImp implements PostService {
     @Override
     public Post savePost(Post post) {
         Set<Tag> postTags = post.getTags();
-        List<Tag> savedTags = tagRepository.saveAll(postTags);
-        Set<Tag> targetTagsSet = new HashSet<>(savedTags);
+        List<Tag> tagList = postTags.stream().toList();
+
+        for (Tag tag : tagList) {
+            boolean existsByTagName = tagRepository.existsByTagName(tag.getTagName());
+            if (!existsByTagName) {
+                Tag savedTag = tagRepository.save(tag);
+                tag.setTagId(savedTag.getTagId());
+            } else {
+                Tag tagFromDB = tagRepository.getByTagName(tag.getTagName());
+                tag.setTagId(tagFromDB.getTagId());
+            }
+        }
+        Set<Tag> targetTagsSet = new HashSet<>(tagList);
+
         post.setTags(targetTagsSet);
-        Post savedPost = postRepository.save(post);
-        return savedPost;
+        return postRepository.save(post);
     }
 
     @Override
@@ -39,7 +53,11 @@ public class PostServiceImp implements PostService {
 
     @Override
     public Post getById(long id) {
-        return postRepository.findById(id).get();
+        Optional<Post> byId = postRepository.findById(id);
+        if (byId.isEmpty()) {
+            throw new IllegalArgumentException("Current post doesn't exist");
+        }
+        return byId.get();
     }
 
     @Override
@@ -50,8 +68,7 @@ public class PostServiceImp implements PostService {
     @Override
     public Post editPostById(Post post, long postId) {
         post.setPostId(postId);
-        Post savedPost = savePost(post);
-        return savedPost;
+        return savePost(post);
     }
 
     @Override
@@ -82,8 +99,6 @@ public class PostServiceImp implements PostService {
 
     @Override
     public Optional<Post> getPostWithAllComments(long postId) {
-        Optional<Post> postRepositoryById = postRepository.findById(postId);
-        return postRepositoryById;
-
+        return postRepository.findById(postId);
     }
 }

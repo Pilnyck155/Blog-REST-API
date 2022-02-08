@@ -1,11 +1,10 @@
 package com.pilnyck.blogrestapi.dto;
 
-import com.pilnyck.blogrestapi.entity.Tag;
 import lombok.Data;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
 
 @Data
 public class PostWithCommentsDto {

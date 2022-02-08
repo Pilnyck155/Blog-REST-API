@@ -7,10 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Set;
 
 @Repository
 public interface TagRepository extends JpaRepository<Tag, Long> {
     @Query("select u from Post u where u.tags = ?1")
     List<Post> findByTag(String tagName);
+
+    boolean existsByTagName(String tagName);
+
+    Tag getByTagName(String tagName);
 }

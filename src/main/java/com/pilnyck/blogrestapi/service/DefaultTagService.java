@@ -1,19 +1,14 @@
 package com.pilnyck.blogrestapi.service;
 
-import com.pilnyck.blogrestapi.dto.PostWithCommentsDto;
-import com.pilnyck.blogrestapi.dto.PostWithoutCommentDto;
 import com.pilnyck.blogrestapi.dto.TagWithoutPostsDto;
 import com.pilnyck.blogrestapi.entity.Post;
 import com.pilnyck.blogrestapi.entity.Tag;
 import com.pilnyck.blogrestapi.repository.PostRepository;
 import com.pilnyck.blogrestapi.repository.TagRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class DefaultTagService implements TagService {
@@ -30,12 +25,18 @@ public class DefaultTagService implements TagService {
     @Override
     public void saveTagByPostId(Tag tag, long postId) {
         Post postFromDB = postRepository.getById(postId);
+        boolean isExist = tagRepository.existsByTagName(tag.getTagName());
+        if (isExist) {
+            Tag tagFromDB = tagRepository.getById(tag.getTagId());
+            postFromDB.getTags().add(tagFromDB);
+            tagFromDB.getPosts().add(postFromDB);
+        } else {
+            postFromDB.getTags().add(tag);
+            tag.getPosts().add(postFromDB);
 
-        postFromDB.getTags().add(tag);
-        tag.getPosts().add(postFromDB);
-
-        tagRepository.save(tag);
-        postRepository.save(postFromDB);
+            tagRepository.save(tag);
+            postRepository.save(postFromDB);
+        }
     }
 
     @Override

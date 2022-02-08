@@ -4,7 +4,6 @@ import com.pilnyck.blogrestapi.entity.Comment;
 import com.pilnyck.blogrestapi.entity.Post;
 import com.pilnyck.blogrestapi.entity.Tag;
 import com.pilnyck.blogrestapi.service.PostService;
-import net.bytebuddy.dynamic.DynamicType;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,18 +13,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.*;
 
 @WebMvcTest(PostController.class)
@@ -41,19 +37,29 @@ class PostControllerTest {
     @Test
     @DisplayName("test save post passed successfully")
     void whenDataIsValid_thenSavePost() throws Exception {
+        Tag firstTag = Tag.builder()
+                .tagId(7L)
+                .tagName("COVID-19")
+                .build();
         Post post = Post.builder()
-                .title("Sport")
-                .content("Dynamo wins again")
+                .postId(11L)
+                .title("Smartphones")
+                .content("Vaccinated Ukrainians over the age of 60 will receive smartphones")
+                .star(true)
+                .tags(Set.of(firstTag))
                 .build();
 
-        when(postService.savePost(any())).thenReturn(post);
+        when(postService.savePost(any(Post.class))).thenReturn(post);
         this.mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/posts")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\": \"Sport\", \"content\": \"Dynamo wins again\"}"))
+                        .content("{\"title\": \"Smartphones\", \"content\": \"Vaccinated Ukrainians over the age of 60 will receive smartphones\"}"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Sport"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Dynamo wins again"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Smartphones"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Vaccinated Ukrainians " +
+                        "over the age of 60 will receive smartphones"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.star").value(true))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tags[0].tagName").value("COVID-19"));
         verify(postService).savePost(any(Post.class));
     }
 
@@ -110,15 +116,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("test get all posts with comments and tags passed successfully")
-    void whenMethodIsCall_thenReturnAllPostsWithCommentsAndTags() throws Exception {
-        Tag firstTag = Tag.builder()
-                .tagId(7L)
-                .tagName("zoo")
-                .build();
-        Tag secondTag = Tag.builder()
-                .tagId(8L)
-                .tagName("stupid")
-                .build();
+    void whenMethodIsCall_thenReturnAllPostsWithoutCommentsAndTags() throws Exception {
         Post firstPost = Post.builder()
                 .postId(1L)
                 .title("Animals")
@@ -130,9 +128,6 @@ class PostControllerTest {
                 .content("Fresh stupid news")
                 .build();
 
-        firstPost.setTags(Set.of(firstTag));
-        secondPost.setTags(Set.of(secondTag));
-
         when(postService.getAllPosts()).thenReturn(List.of(firstPost, secondPost));
         this.mockMvc
                 .perform(MockMvcRequestBuilders
@@ -140,9 +135,7 @@ class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.size()", Matchers.is(2)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("Animals"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("Fresh news"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].tags[0].tagName").value("zoo"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].tags[0].tagName").value("stupid"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("Fresh news"));
     }
 
     @Test
@@ -204,30 +197,42 @@ class PostControllerTest {
     @Test
     @DisplayName("test get post by id passed successfully")
     void whenIdIsValid_thenReturnPostById() throws Exception {
+        Tag tag = Tag.builder()
+                .tagId(7L)
+                .tagName("Elephant")
+                .build();
         Post post = Post.builder()
                 .postId(1L)
                 .title("Animals")
                 .content("The elephant escaped from zoo")
+                .tags(Set.of(tag))
                 .build();
         when(postService.getById(1L)).thenReturn(post);
         this.mockMvc.perform(MockMvcRequestBuilders
                         .get("/api/v1/posts/{id}", 1))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Animals"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("The elephant escaped from zoo"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("The elephant escaped from zoo"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tags[0].tagName").value("Elephant"));
     }
 
     //problems with this test
     @Test
     @DisplayName("test edit post by id passed successfully")
     void whenDataIsValid_thenSaveEditPost_andReturnEditedPost() throws Exception {
-        long id = 1L;
-        Post post = Post.builder()
-                .postId(id)
+        Tag tag = Tag.builder()
+                .tagId(7L)
+                .tagName("Football")
+                .build();
+        Post firstPost = Post.builder()
+                .postId(1L)
                 .title("Sport")
                 .content("Dynamo wins again")
+                .star(true)
+                .tags(Set.of(tag))
                 .build();
-        when(postService.editPostById(post, id)).thenReturn(post);
+
+        when(postService.editPostById(any(), anyLong())).thenReturn(firstPost);
 
         this.mockMvc.perform(MockMvcRequestBuilders
                         .put("/api/v1/posts/{id}", 1)
@@ -235,33 +240,8 @@ class PostControllerTest {
                         .content("{\"title\": \"Sport\", \"content\": \"Dynamo wins again\"}"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Sport"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Dynamo wins again"));
-    }
-
-    //problems with this test
-    @Test
-    @DisplayName("test edit post by id with tags passed successfully")
-    void whenDataIsValid_thenSaveEditPostWithTags_andReturnEditedPostWithTags() throws Exception {
-        Tag firstTag = Tag.builder()
-                .tagId(11L)
-                .tagName("stupid")
-                .build();
-        Post post = Post.builder()
-                .postId(1L)
-                .title("Sport")
-                .content("Dynamo wins again")
-                .build();
-        post.setTags(Set.of(firstTag));
-        when(postService.editPostById(isA(Post.class), isA(Long.class))).thenReturn(post);
-        //verify(postService, times(1)).editPostById(post, 1);
-
-        this.mockMvc.perform(MockMvcRequestBuilders
-                        .put("/api/v1/posts/{id}", 1)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Sport"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content").value("Dynamo wins again"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.tags[0].tagName").value("stupid"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tags[0].tagName").value("Football"));
     }
 
     @Test
@@ -269,8 +249,8 @@ class PostControllerTest {
     void whenIdIsValid_thenPostDelete() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders
                         .delete("/api/v1/posts/{id}", 1))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("Post delete successfully"));
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        verify(postService).deletePostById(any(Long.class));
     }
 
 
