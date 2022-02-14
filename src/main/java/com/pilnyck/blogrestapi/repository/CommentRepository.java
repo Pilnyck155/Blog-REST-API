@@ -8,9 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    @Query(
-            value = "SELECT comment_id, creation_date, text, post_id FROM comment WHERE post_id=?1 AND comment_id=?2",
-            nativeQuery = true
-    )
+    @Query("select c.commentId, c.creationDate, c.text, c.post.postId from Comment c where c.post.postId=?1 and c.commentId=?2")
     Comment findCommentByPostIdAndCommentId(long postId, long commentId);
 }

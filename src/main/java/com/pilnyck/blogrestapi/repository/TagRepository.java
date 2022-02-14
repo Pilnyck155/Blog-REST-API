@@ -16,4 +16,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     boolean existsByTagName(String tagName);
 
     Tag getByTagName(String tagName);
+
+    @Query("select p from Post p where p.tags in :tags")
+    List<Post> findAllPostsByTags(List<String> tags);
 }

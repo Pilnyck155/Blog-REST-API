@@ -1,48 +1,30 @@
-package com.pilnyck.blogrestapi.service;
+package com.pilnyck.blogrestapi.service.realization;
 
 import com.pilnyck.blogrestapi.entity.Post;
-import com.pilnyck.blogrestapi.entity.Tag;
 import com.pilnyck.blogrestapi.repository.PostRepository;
-import com.pilnyck.blogrestapi.repository.TagRepository;
+import com.pilnyck.blogrestapi.service.interfaces.PostService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
-public class PostServiceImp implements PostService {
+public class DefaultPostService implements PostService {
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
 
     @Autowired
-    private TagRepository tagRepository;
+    public DefaultPostService(PostRepository postRepository) {
+        this.postRepository = postRepository;
+    }
 
     @Override
     public Post savePost(Post post) {
-        Set<Tag> postTags = post.getTags();
-        List<Tag> tagList = postTags.stream().toList();
-
-        for (Tag tag : tagList) {
-            boolean existsByTagName = tagRepository.existsByTagName(tag.getTagName());
-            if (!existsByTagName) {
-                Tag savedTag = tagRepository.save(tag);
-                tag.setTagId(savedTag.getTagId());
-            } else {
-                Tag tagFromDB = tagRepository.getByTagName(tag.getTagName());
-                tag.setTagId(tagFromDB.getTagId());
-            }
-        }
-        Set<Tag> targetTagsSet = new HashSet<>(tagList);
-
-        post.setTags(targetTagsSet);
         return postRepository.save(post);
     }
 

@@ -1,4 +1,4 @@
-package com.pilnyck.blogrestapi.service;
+package com.pilnyck.blogrestapi.service.interfaces;
 
 import com.pilnyck.blogrestapi.entity.Comment;
 

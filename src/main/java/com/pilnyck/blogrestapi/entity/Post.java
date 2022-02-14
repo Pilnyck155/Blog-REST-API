@@ -1,18 +1,16 @@
 package com.pilnyck.blogrestapi.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -42,7 +40,7 @@ public class Post {
     @JoinColumn(name = "post_id", referencedColumnName = "postId")
     private List<Comment> comments;
 
-    @ManyToMany(mappedBy = "posts")
+    @ManyToMany(mappedBy = "posts", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private Set<Tag> tags = new LinkedHashSet<>();
 
     public Set<Tag> getTags() {
@@ -51,5 +49,30 @@ public class Post {
 
     public void setTags(Set<Tag> tags) {
         this.tags = tags;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Post post = (Post) o;
+        return postId == post.postId && star == post.star && title.equals(post.title) && content.equals(post.content);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(postId, title, content, star);
+    }
+
+    @Override
+    public String toString() {
+        return "Post{" +
+                "postId=" + postId +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", star=" + star +
+                ", comments=" + comments +
+                ", tags=" + tags +
+                '}';
     }
 }

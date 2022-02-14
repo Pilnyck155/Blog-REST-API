@@ -5,7 +5,7 @@ import com.pilnyck.blogrestapi.dto.CommentWithoutPostDto;
 import com.pilnyck.blogrestapi.dto.PostWithoutCommentDto;
 import com.pilnyck.blogrestapi.entity.Comment;
 import com.pilnyck.blogrestapi.entity.Post;
-import com.pilnyck.blogrestapi.service.CommentService;
+import com.pilnyck.blogrestapi.service.interfaces.CommentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +18,13 @@ import java.util.List;
 @RequestMapping("/api/v1/posts")
 public class CommentController {
     Logger logger = LoggerFactory.getLogger(getClass());
-    //TODO: DELETE ALL COMMENTS
+
+    private final CommentService commentService;
 
     @Autowired
-    private CommentService commentService;
+    public CommentController(CommentService commentService) {
+        this.commentService = commentService;
+    }
 
     @PostMapping("/{id}/comments")
     public CommentWithPostDto addCommentToPostById(@PathVariable long id,

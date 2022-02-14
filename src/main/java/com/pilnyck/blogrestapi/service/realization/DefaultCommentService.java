@@ -1,30 +1,31 @@
-package com.pilnyck.blogrestapi.service;
+package com.pilnyck.blogrestapi.service.realization;
 
 import com.pilnyck.blogrestapi.entity.Comment;
 import com.pilnyck.blogrestapi.entity.Post;
 import com.pilnyck.blogrestapi.repository.CommentRepository;
 import com.pilnyck.blogrestapi.repository.PostRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.pilnyck.blogrestapi.service.interfaces.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class DefaultCommentService implements CommentService {
 
-    @Autowired
-    private CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
+
+    private final PostRepository postRepository;
 
     @Autowired
-    private PostRepository postRepository;
+    public DefaultCommentService(CommentRepository commentRepository, PostRepository postRepository) {
+        this.commentRepository = commentRepository;
+        this.postRepository = postRepository;
+    }
 
     @Override
     public Comment saveComment(long id, Comment comment) {
         Post postFromDB = postRepository.getById(id);
-        //TODO: Add Optional when return Post from DB
         comment.setPost(postFromDB);
         Comment savedComment = commentRepository.save(comment);
         return savedComment;
@@ -33,13 +34,11 @@ public class DefaultCommentService implements CommentService {
     @Override
     public List<Comment> getCommentsByPostId(long postId) {
         Post postFromDB = postRepository.getById(postId);
-        List<Comment> commentsFromPost = postFromDB.getComments();
-        return commentsFromPost;
+        return postFromDB.getComments();
     }
 
     @Override
     public Comment getCommentByPostIdAndCommentId(long postId, long commentId) {
-        Comment byPostIdAndCommentId = commentRepository.findCommentByPostIdAndCommentId(postId, commentId);
-        return byPostIdAndCommentId;
+        return commentRepository.findCommentByPostIdAndCommentId(postId, commentId);
     }
 }

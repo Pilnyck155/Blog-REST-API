@@ -3,7 +3,7 @@ package com.pilnyck.blogrestapi.controller;
 import com.pilnyck.blogrestapi.entity.Comment;
 import com.pilnyck.blogrestapi.entity.Post;
 import com.pilnyck.blogrestapi.entity.Tag;
-import com.pilnyck.blogrestapi.service.PostService;
+import com.pilnyck.blogrestapi.service.interfaces.PostService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

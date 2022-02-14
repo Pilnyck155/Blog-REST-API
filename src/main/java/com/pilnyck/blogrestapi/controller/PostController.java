@@ -1,10 +1,13 @@
 package com.pilnyck.blogrestapi.controller;
 
-import com.pilnyck.blogrestapi.dto.*;
+import com.pilnyck.blogrestapi.dto.CommentWithoutPostDto;
+import com.pilnyck.blogrestapi.dto.PostWithCommentsDto;
+import com.pilnyck.blogrestapi.dto.PostWithoutCommentDto;
+import com.pilnyck.blogrestapi.dto.TagWithoutPostsDto;
 import com.pilnyck.blogrestapi.entity.Comment;
 import com.pilnyck.blogrestapi.entity.Post;
 import com.pilnyck.blogrestapi.entity.Tag;
-import com.pilnyck.blogrestapi.service.PostService;
+import com.pilnyck.blogrestapi.service.interfaces.PostService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +20,12 @@ import java.util.*;
 public class PostController {
     Logger logger = LoggerFactory.getLogger(getClass());
 
+    private final PostService postService;
+
     @Autowired
-    private PostService postService;
+    public PostController(PostService postService) {
+        this.postService = postService;
+    }
 
     @PostMapping
     public PostWithCommentsDto savePost(@RequestBody Post post) {
@@ -106,27 +113,26 @@ public class PostController {
 
 
     private PostWithCommentsDto toPostWithCommentsDto(Post post) {
-        PostWithCommentsDto postWithCommentsDto = new PostWithCommentsDto();
-        postWithCommentsDto.setPostId(post.getPostId());
-        postWithCommentsDto.setContent(post.getContent());
-        postWithCommentsDto.setTitle(post.getTitle());
-        postWithCommentsDto.setStar(post.isStar());
-
+        List<CommentWithoutPostDto> commentWithoutPostDto = new ArrayList<>();
         List<Comment> commentList = post.getComments();
-        if (commentList != null) {
-            List<CommentWithoutPostDto> listComments = new ArrayList<>();
-            for (Comment comment : commentList) {
-                listComments.add(toCommentWithoutPostDto(comment));
-            }
-            postWithCommentsDto.setComments(listComments);
+        for (Comment comment : commentList) {
+            commentWithoutPostDto.add(toCommentWithoutPostDto(comment));
         }
 
-        Set<TagWithoutPostsDto> tagWithoutPostsDtos = new LinkedHashSet<>();
-        Set<Tag> tags = post.getTags();
-        for (Tag tag : tags) {
-            tagWithoutPostsDtos.add(toTagWithoutPostsDto(tag));
+        Set<TagWithoutPostsDto> tagWithoutPostsDto = new HashSet<>(post.getTags().size());
+        Set<Tag> postTags = post.getTags();
+        for (Tag tag : postTags) {
+            tagWithoutPostsDto.add(toTagWithoutPostsDto(tag));
         }
-        postWithCommentsDto.setTags(tagWithoutPostsDtos);
+
+        PostWithCommentsDto postWithCommentsDto = PostWithCommentsDto.builder()
+                .postId(post.getPostId())
+                .title(post.getTitle())
+                .comments(commentWithoutPostDto)
+                .content(post.getContent())
+                .star(post.isStar())
+                .tags(tagWithoutPostsDto)
+                .build();
 
         return postWithCommentsDto;
     }

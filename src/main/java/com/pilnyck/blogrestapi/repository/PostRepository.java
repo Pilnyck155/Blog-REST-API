@@ -14,15 +14,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findAllByStarTrue();
 
-    @Query(
-            value = "UPDATE Post SET star=true WHERE id=?1 RETURNING *",
-            nativeQuery = true
-            )
+    @Query(value = "update Post p set p.star=true where p.postId=?1")
     Post updatePostByIdAndSetTrue(long id);
 
-    @Query(
-            value = "UPDATE Post SET star=false WHERE id=?1 RETURNING *",
-            nativeQuery = true
-    )
+    @Query(value = "update Post p set p.star=false where p.postId=?1")
     Post updatePostByIdAndSetFalse(long id);
 }
